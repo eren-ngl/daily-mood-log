@@ -1,0 +1,91 @@
+import datetime
+import os
+
+FILE_NAME = "moods.txt"
+
+
+def clear_screen():
+    os.system("clear")
+
+
+def save_mood(mood: str) -> None:
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    with open(FILE_NAME, "a", encoding="utf-8") as f:
+        f.write(f"{today} | {mood.strip()}\n")
+
+
+def read_moods() -> list[str]:
+    if not os.path.exists(FILE_NAME):
+        return []
+    with open(FILE_NAME, "r", encoding="utf-8") as f:
+        lines = [line.strip() for line in f.readlines() if line.strip()]
+    return lines
+
+
+def show_moods() -> None:
+    logs = read_moods()
+    if not logs:
+        print("😌 এখনও কোনো mood log নাই। আগে mood add করো!\n")
+        return
+
+    print("📖 Mood History:\n")
+    for line in logs[-30:]:
+        print("•", line)
+    print("\n(শেষ ৩০টা এন্ট্রি দেখানো হলো)\n")
+
+
+def show_stats() -> None:
+    logs = read_moods()
+    if not logs:
+        print("📊 Stats দেখানোর মতো কোনো data নাই।\n")
+        return
+
+    total = len(logs)
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    today_count = sum(1 for x in logs if x.startswith(today))
+
+    print("📊 Quick Stats:\n")
+    print(f"• Total logs: {total}")
+    print(f"• Today's logs ({today}): {today_count}\n")
+
+
+def main():
+    while True:
+        clear_screen()
+        print("🧠 Daily Mood Log (Python CLI)")
+        print("-" * 28)
+        print("1) Add today's mood")
+        print("2) View mood history")
+        print("3) View quick stats")
+        print("4) Exit\n")
+
+        choice = input("Choose (1/2/3/4): ").strip()
+
+        clear_screen()
+
+        if choice == "1":
+            mood = input("আজকে তোমার mood কেমন? (ex: happy / meh / sad / tired): ")
+            if mood.strip():
+                save_mood(mood)
+                print("\n✅ Mood saved!\n")
+            else:
+                print("\n❌ খালি mood save হবে না।\n")
+
+        elif choice == "2":
+            show_moods()
+
+        elif choice == "3":
+            show_stats()
+
+        elif choice == "4":
+            print("👋 Bye! ভালো থেকো.\n")
+            break
+
+        else:
+            print("❌ Invalid choice. আবার চেষ্টা করো।\n")
+
+        input("Press Enter to continue...")
+
+
+if __name__ == "__main__":
+    main()
